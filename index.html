@@ -1,234 +1,150 @@
 <!doctype html>
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Impostor – Clash Royale</title>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Impostor – Clash Royale</title>
 
-  <style>
-    body {
-      margin: 0;
-      font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial;
-      background: #0b1220;
-      color: #eaf0ff;
-    }
-    .wrap {
-      max-width: 780px;
-      margin: 0 auto;
-      padding: 18px;
-    }
-    h1 {
-      font-size: 20px;
-      margin-bottom: 12px;
-    }
-    .card {
-      background: #121b2e;
-      border-radius: 16px;
-      padding: 16px;
-      border: 1px solid rgba(255,255,255,.12);
-    }
-    .pill {
-      display: inline-block;
-      padding: 8px 12px;
-      border-radius: 999px;
-      background: rgba(255,255,255,.06);
-      border: 1px solid rgba(255,255,255,.10);
-      font-size: 13px;
-      margin: 4px 6px 0 0;
-    }
-    .big {
-      margin-top: 16px;
-      padding: 20px;
-      border-radius: 16px;
-      background: rgba(255,255,255,.05);
-      border: 1px solid rgba(255,255,255,.12);
-      text-align: center;
-      min-height: 260px;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      gap: 10px;
-    }
-    .identity {
-      font-size: 34px;
-      font-weight: 900;
-    }
-    .impostor {
-      color: #ff6b6b;
-    }
-    img {
-      max-width: 280px;
-      margin: 10px auto 0;
-      border-radius: 14px;
-      border: 1px solid rgba(255,255,255,.12);
-      display: none;
-    }
-    .meta {
-      font-size: 13px;
-      color: #cfe0ff;
-      display: none;
-      gap: 10px;
-      justify-content: center;
-      flex-wrap: wrap;
-    }
-    .btns {
-      display: flex;
-      gap: 10px;
-      justify-content: center;
-      margin-top: 16px;
-      flex-wrap: wrap;
-    }
-    button {
-      border: none;
-      padding: 12px 16px;
-      border-radius: 14px;
-      font-weight: 800;
-      cursor: pointer;
-    }
-    .primary {
-      background: #7aa7ff;
-      color: #071021;
-    }
-    .ghost {
-      background: transparent;
-      color: #eaf0ff;
-      border: 1px solid rgba(255,255,255,.18);
-    }
-    .danger {
-      background: rgba(255,107,107,.18);
-      color: #fff;
-      border: 1px solid rgba(255,107,107,.28);
-    }
-    button:disabled {
-      opacity: .5;
-      cursor: not-allowed;
-    }
-  </style>
+<style>
+body{
+  margin:0;
+  font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial;
+  background:#0b1220;
+  color:#eaf0ff;
+}
+.wrap{max-width:720px;margin:auto;padding:16px}
+.card{background:#121b2e;border-radius:16px;padding:16px}
+.big{
+  margin-top:14px;
+  padding:20px;
+  border-radius:16px;
+  background:rgba(255,255,255,.05);
+  text-align:center;
+  min-height:260px;
+  display:flex;
+  flex-direction:column;
+  justify-content:center;
+  gap:12px
+}
+.identity{font-size:34px;font-weight:900}
+.impostor{color:#ff6b6b}
+img{
+  max-width:260px;
+  margin:auto;
+  border-radius:14px;
+  display:none;
+}
+button{
+  padding:12px 16px;
+  border-radius:14px;
+  font-weight:800;
+  border:none;
+  cursor:pointer
+}
+.primary{background:#7aa7ff}
+.ghost{background:transparent;color:#fff;border:1px solid #fff3}
+.danger{background:#ff6b6b}
+.btns{display:flex;gap:10px;justify-content:center;margin-top:16px}
+</style>
 </head>
 
 <body>
 <div class="wrap">
-  <h1>Impostor – Clash Royale (4 Players)</h1>
+<h2>Impostor – Clash Royale</h2>
 
-  <div class="card">
-    <div class="pill">Starting player: <b id="starter">?</b></div>
-    <div class="pill">Current player: <b id="current">1</b></div>
+<div class="card">
+  <div>Starting player: <b id="starter">?</b></div>
+  <div>Current player: <b id="current">1</b></div>
 
-    <div class="big">
-      <div id="status">Loading cards…</div>
-      <div id="identity" class="identity">—</div>
-
-      <img id="cardImg" referrerpolicy="no-referrer" />
-
-      <div id="meta" class="meta">
-        <span id="type"></span>
-        <span id="rarity"></span>
-        <span id="elixir"></span>
-      </div>
-    </div>
-
-    <div class="btns">
-      <button id="reveal" class="primary" disabled>Reveal</button>
-      <button id="next" class="ghost" disabled>Next player</button>
-      <button id="reset" class="danger" style="display:none;">Reset</button>
-    </div>
+  <div class="big">
+    <div id="status">Loading cards…</div>
+    <div id="identity" class="identity">—</div>
+    <img id="cardImg">
   </div>
+
+  <div class="btns">
+    <button id="reveal" class="primary" disabled>Reveal</button>
+    <button id="next" class="ghost" disabled>Next</button>
+    <button id="reset" class="danger" style="display:none">Reset</button>
+  </div>
+</div>
 </div>
 
 <script>
 const CARDS_URL = "https://royaleapi.github.io/cr-api-data/json/cards.json";
-const IMG_BASE = "https://www.deckshop.pro/img/card/full/";
+const ICON_BASE = "https://royaleapi.github.io/cr-api-data/img/cards/";
 
+let cards=[], secret, impostor, starter, current=1;
 
-let cards = [];
-let secret;
-let impostor;
-let starter;
-let current = 1;
+const $=id=>document.getElementById(id);
+const r4=()=>Math.floor(Math.random()*4)+1;
 
-const $ = id => document.getElementById(id);
-const rand4 = () => Math.floor(Math.random() * 4) + 1;
-
-function imageName(name) {
-  return name.replace(/[^A-Za-z0-9]/g, "") + ".png";
-}
-
-
-function hide() {
-  $("identity").textContent = "Hidden";
+function hide(){
+  $("identity").textContent="Hidden";
   $("identity").classList.remove("impostor");
-  $("cardImg").style.display = "none";
-  $("meta").style.display = "none";
+  $("cardImg").style.display="none";
 }
 
-function newRound() {
-  impostor = rand4();
-  starter = rand4();
-  current = 1;
-  secret = cards[Math.floor(Math.random() * cards.length)];
+function newRound(){
+  impostor=r4();
+  starter=r4();
+  current=1;
+  secret=cards[Math.floor(Math.random()*cards.length)];
 
-  $("starter").textContent = starter;
-  $("current").textContent = current;
-  $("status").textContent = `Player ${current}: press Reveal`;
+  $("starter").textContent=starter;
+  $("current").textContent=current;
+  $("status").textContent=`Player ${current}: press Reveal`;
   hide();
 
-  $("reveal").disabled = false;
-  $("next").disabled = true;
-  $("next").style.display = "inline-block";
-  $("reset").style.display = "none";
+  $("reveal").disabled=false;
+  $("next").disabled=true;
+  $("next").style.display="inline-block";
+  $("reset").style.display="none";
 }
 
-function reveal() {
-  if (current === impostor) {
-    $("identity").textContent = "IMPOSTOR";
+function reveal(){
+  if(current===impostor){
+    $("identity").textContent="IMPOSTOR";
     $("identity").classList.add("impostor");
-  } else {
-    $("identity").textContent = secret.name;
-    $("cardImg").src = IMG_BASE + imageName(secret.name);
-    $("cardImg").style.display = "block";
-
-    $("type").textContent = secret.type;
-    $("rarity").textContent = secret.rarity;
-    $("elixir").textContent = `Elixir: ${secret.elixir}`;
-    $("meta").style.display = "flex";
+  }else{
+    $("identity").textContent=secret.name;
+    $("cardImg").src = ICON_BASE + secret.key + ".png";
+    $("cardImg").style.display="block";
   }
 
   $("status").textContent =
-    `Player ${current}: remember it, then press ${current === 4 ? "Reset" : "Next"}`;
+    `Player ${current}: ${current===4?"Reset":"Next"}`;
 
-  $("reveal").disabled = true;
-  $("next").disabled = false;
+  $("reveal").disabled=true;
+  $("next").disabled=false;
 
-  if (current === 4) {
-    $("next").style.display = "none";
-    $("reset").style.display = "inline-block";
+  if(current===4){
+    $("next").style.display="none";
+    $("reset").style.display="inline-block";
   }
 }
 
-function nextPlayer() {
+function nextPlayer(){
   current++;
-  $("current").textContent = current;
-  $("status").textContent = `Player ${current}: press Reveal`;
+  $("current").textContent=current;
+  $("status").textContent=`Player ${current}: press Reveal`;
   hide();
-
-  $("reveal").disabled = false;
-  $("next").disabled = true;
+  $("reveal").disabled=false;
+  $("next").disabled=true;
 }
 
-$("reveal").onclick = reveal;
-$("next").onclick = nextPlayer;
-$("reset").onclick = newRound;
+$("reveal").onclick=reveal;
+$("next").onclick=nextPlayer;
+$("reset").onclick=newRound;
 
 fetch(CARDS_URL)
-  .then(r => r.json())
-  .then(data => {
-    cards = data;
-    $("status").textContent = "Ready. Press Reset to start.";
-    $("reset").style.display = "inline-block";
-  })
-  .catch(() => {
-    $("status").textContent = "Failed to load cards.";
-  });
+.then(r=>r.json())
+.then(d=>{
+  cards=d;
+  $("status").textContent="Ready. Press Reset.";
+  $("reset").style.display="inline-block";
+})
+.catch(()=>{$("status").textContent="Failed to load cards";});
 </script>
 </body>
 </html>
