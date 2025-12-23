@@ -6,145 +6,186 @@
 <title>Impostor – Clash Royale</title>
 
 <style>
-body{
-  margin:0;
-  font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial;
-  background:#0b1220;
-  color:#eaf0ff;
+body {
+  margin: 0;
+  font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial;
+  background: #0b1220;
+  color: #eaf0ff;
 }
-.wrap{max-width:720px;margin:auto;padding:16px}
-.card{background:#121b2e;border-radius:16px;padding:16px}
-.big{
-  margin-top:14px;
-  padding:20px;
-  border-radius:16px;
-  background:rgba(255,255,255,.05);
-  text-align:center;
-  min-height:260px;
-  display:flex;
-  flex-direction:column;
-  justify-content:center;
-  gap:12px
+.wrap {
+  max-width: 720px;
+  margin: auto;
+  padding: 18px;
 }
-.identity{font-size:34px;font-weight:900}
-.impostor{color:#ff6b6b}
-img{
-  max-width:260px;
-  margin:auto;
-  border-radius:14px;
-  display:none;
+.card {
+  background: #121b2e;
+  border-radius: 16px;
+  padding: 16px;
 }
-button{
-  padding:12px 16px;
-  border-radius:14px;
-  font-weight:800;
-  border:none;
-  cursor:pointer
+.big {
+  margin-top: 14px;
+  padding: 22px;
+  border-radius: 16px;
+  background: rgba(255,255,255,.05);
+  text-align: center;
+  min-height: 280px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 12px;
 }
-.primary{background:#7aa7ff}
-.ghost{background:transparent;color:#fff;border:1px solid #fff3}
-.danger{background:#ff6b6b}
-.btns{display:flex;gap:10px;justify-content:center;margin-top:16px}
+.identity {
+  font-size: 36px;
+  font-weight: 900;
+}
+.impostor {
+  color: #ff6b6b;
+}
+img {
+  max-width: 260px;
+  margin: 10px auto 0;
+  border-radius: 14px;
+  display: none;
+}
+button {
+  padding: 12px 18px;
+  border-radius: 14px;
+  font-weight: 800;
+  border: none;
+  cursor: pointer;
+}
+.primary { background: #7aa7ff; color: #071021; }
+.ghost { background: transparent; color: #eaf0ff; border: 1px solid rgba(255,255,255,.25); }
+.danger { background: #ff6b6b; color: #071021; }
+.btns {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+  margin-top: 16px;
+}
+.info {
+  margin-bottom: 8px;
+  font-size: 14px;
+}
 </style>
 </head>
 
 <body>
 <div class="wrap">
-<h2>Impostor – Clash Royale</h2>
+  <h2>Impostor – Clash Royale</h2>
 
-<div class="card">
-  <div>Starting player: <b id="starter">?</b></div>
-  <div>Current player: <b id="current">1</b></div>
+  <div class="card">
+    <div class="info">Starting player: <b id="starter">?</b></div>
+    <div class="info">Current player: <b id="current">1</b></div>
 
-  <div class="big">
-    <div id="status">Loading cards…</div>
-    <div id="identity" class="identity">—</div>
-    <img id="cardImg">
+    <div class="big">
+      <div id="status">Loading cards…</div>
+      <div id="identity" class="identity">—</div>
+      <img id="cardImg">
+    </div>
+
+    <div class="btns">
+      <button id="reveal" class="primary" disabled>Reveal</button>
+      <button id="next" class="ghost" disabled>Next</button>
+      <button id="reset" class="danger" style="display:none">Reset</button>
+    </div>
   </div>
-
-  <div class="btns">
-    <button id="reveal" class="primary" disabled>Reveal</button>
-    <button id="next" class="ghost" disabled>Next</button>
-    <button id="reset" class="danger" style="display:none">Reset</button>
-  </div>
-</div>
 </div>
 
 <script>
+/* ===== DATA SOURCES (WORKING) ===== */
 const CARDS_URL = "https://royaleapi.github.io/cr-api-data/json/cards.json";
-const ICON_BASE = "https://royaleapi.github.io/cr-api-data/img/cards/";
+const IMG_BASE_150 = "https://cdn.jsdelivr.net/gh/RoyaleAPI/cr-api-assets@master/cards-150/";
+const IMG_BASE_FULL = "https://cdn.jsdelivr.net/gh/RoyaleAPI/cr-api-assets@master/cards/";
 
-let cards=[], secret, impostor, starter, current=1;
+/* ===== STATE ===== */
+let cards = [];
+let secret;
+let impostor;
+let starter;
+let current = 1;
 
-const $=id=>document.getElementById(id);
-const r4=()=>Math.floor(Math.random()*4)+1;
+/* ===== HELPERS ===== */
+const $ = id => document.getElementById(id);
+const rand4 = () => Math.floor(Math.random() * 4) + 1;
 
-function hide(){
-  $("identity").textContent="Hidden";
+function hideCard() {
+  $("identity").textContent = "Hidden";
   $("identity").classList.remove("impostor");
-  $("cardImg").style.display="none";
+  $("cardImg").style.display = "none";
 }
 
-function newRound(){
-  impostor=r4();
-  starter=r4();
-  current=1;
-  secret=cards[Math.floor(Math.random()*cards.length)];
+/* ===== GAME LOGIC ===== */
+function newRound() {
+  impostor = rand4();
+  starter = rand4();
+  current = 1;
+  secret = cards[Math.floor(Math.random() * cards.length)];
 
-  $("starter").textContent=starter;
-  $("current").textContent=current;
-  $("status").textContent=`Player ${current}: press Reveal`;
-  hide();
+  $("starter").textContent = starter;
+  $("current").textContent = current;
+  $("status").textContent = `Player ${current}: press Reveal`;
+  hideCard();
 
-  $("reveal").disabled=false;
-  $("next").disabled=true;
-  $("next").style.display="inline-block";
-  $("reset").style.display="none";
+  $("reveal").disabled = false;
+  $("next").disabled = true;
+  $("next").style.display = "inline-block";
+  $("reset").style.display = "none";
 }
 
-function reveal(){
-  if(current===impostor){
-    $("identity").textContent="IMPOSTOR";
+function reveal() {
+  if (current === impostor) {
+    $("identity").textContent = "IMPOSTOR";
     $("identity").classList.add("impostor");
-  }else{
-    $("identity").textContent=secret.name;
-    $("cardImg").src = ICON_BASE + secret.key + ".png";
-    $("cardImg").style.display="block";
+  } else {
+    $("identity").textContent = secret.name;
+
+    const img = $("cardImg");
+    img.onerror = () => {
+      img.onerror = null;
+      img.src = IMG_BASE_FULL + secret.key + ".png";
+    };
+    img.src = IMG_BASE_150 + secret.key + ".png";
+    img.style.display = "block";
   }
 
   $("status").textContent =
-    `Player ${current}: ${current===4?"Reset":"Next"}`;
+    `Player ${current}: ${current === 4 ? "Reset" : "Next"}`;
 
-  $("reveal").disabled=true;
-  $("next").disabled=false;
+  $("reveal").disabled = true;
+  $("next").disabled = false;
 
-  if(current===4){
-    $("next").style.display="none";
-    $("reset").style.display="inline-block";
+  if (current === 4) {
+    $("next").style.display = "none";
+    $("reset").style.display = "inline-block";
   }
 }
 
-function nextPlayer(){
+function nextPlayer() {
   current++;
-  $("current").textContent=current;
-  $("status").textContent=`Player ${current}: press Reveal`;
-  hide();
-  $("reveal").disabled=false;
-  $("next").disabled=true;
+  $("current").textContent = current;
+  $("status").textContent = `Player ${current}: press Reveal`;
+  hideCard();
+  $("reveal").disabled = false;
+  $("next").disabled = true;
 }
 
-$("reveal").onclick=reveal;
-$("next").onclick=nextPlayer;
-$("reset").onclick=newRound;
+/* ===== EVENTS ===== */
+$("reveal").onclick = reveal;
+$("next").onclick = nextPlayer;
+$("reset").onclick = newRound;
 
+/* ===== LOAD CARDS ===== */
 fetch(CARDS_URL)
-.then(r=>r.json())
-.then(d=>{
-  cards=d;
-  $("status").textContent="Ready. Press Reset.";
-  $("reset").style.display="inline-block";
-})
-.catch(()=>{$("status").textContent="Failed to load cards";});
+  .then(r => r.json())
+  .then(data => {
+    cards = data;
+    $("status").textContent = "Ready. Press Reset to start.";
+    $("reset").style.display = "inline-block";
+  })
+  .catch(() => {
+    $("status").textContent = "Failed to load cards.";
+  });
 </script>
 </body>
 </html>
